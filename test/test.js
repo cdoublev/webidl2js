@@ -1,14 +1,14 @@
-"use strict";
 
-const fs = require("fs");
-const path = require("path");
-const Transformer = require("..");
-const reflector = require("./reflector");
+import dirname from "./dirname.cjs";
+import fs from "node:fs";
+import path from "node:path";
+import Transformer from "../lib/transformer.js";
+import * as reflector from "./reflector.js";
 
-const rootDir = path.resolve(__dirname, "..");
-const casesDir = path.resolve(__dirname, "cases");
-const implsDir = path.resolve(__dirname, "implementations");
-const outputDir = path.resolve(__dirname, "output");
+const rootDir = path.resolve(dirname, "..");
+const casesDir = path.resolve(dirname, "cases");
+const implsDir = path.resolve(dirname, "implementations");
+const outputDir = path.resolve(dirname, "output");
 
 const idlFiles = fs.readdirSync(casesDir);
 

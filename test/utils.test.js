@@ -1,6 +1,5 @@
-"use strict";
 
-const utils = require("../lib/output/utils");
+import * as utils from "../lib/output/utils.js";
 
 describe("utils.js", () => {
   describe("isObject", () => {

@@ -15,7 +15,7 @@ interface SomeInterface {
 combined with the JavaScript implementation class file
 
 ```js
-exports.implementation = class SomeInterfaceImpl {
+export default class SomeInterfaceImpl {
   add(x, y) {
     return x + y;
   }
@@ -25,10 +25,10 @@ exports.implementation = class SomeInterfaceImpl {
 will generate a JavaScript wrapper class file roughly like this:
 
 ```js
-const conversions = require("webidl-conversions");
-const { implSymbol, ctorRegistrySymbol } = require("./utils.js");
+import conversions from "webidl-conversions";
+import { implSymbol, ctorRegistrySymbol } from "./utils.js";
 
-const Impl = require("./SomeInterface-impl.js").implementation;
+import Impl from "./SomeInterface-impl.js";
 
 class SomeInterface {
   constructor() {
@@ -93,8 +93,7 @@ For more examples, you can check out the `test/` directory (with the generated o
 A typical Node.js script that compiles IDL using webidl2js looks like the following:
 
 ```js
-"use strict";
-const WebIDL2JS = require("webidl2js");
+import WebIDL2JS from "webidl2js";
 
 const transformer = new WebIDL2JS({ implSuffix: "-impl" });
 
@@ -146,8 +145,7 @@ The following variables are available in the scope of the replacement code:
 An example of code that uses these hooks is as follows:
 
 ```js
-"use strict";
-const WebIDL2JS = require("webidl2js");
+import WebIDL2JS from "webidl2js";
 
 const transformer = new WebIDL2JS({
   implSuffix: "-impl",
