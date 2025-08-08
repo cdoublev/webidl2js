@@ -3873,6 +3873,7 @@ import HTMLCollection from "./HTMLCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "HTMLCollection";
 
 const interfaceName = "HTMLFormControlsCollection";
 
@@ -4182,7 +4183,7 @@ class ProxyHandler {
   }
 }
 
-export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup };
+export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup, inheritance };
 "
 `;
 
@@ -10207,6 +10208,7 @@ import URLSearchParamsCollection from "./URLSearchParamsCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "URLSearchParamsCollection";
 
 const interfaceName = "URLSearchParamsCollection2";
 
@@ -10521,7 +10523,7 @@ class ProxyHandler {
   }
 }
 
-export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup };
+export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup, inheritance };
 "
 `;
 
@@ -15037,6 +15039,7 @@ import HTMLCollection from "./HTMLCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "HTMLCollection";
 
 const interfaceName = "HTMLFormControlsCollection";
 
@@ -15346,7 +15349,7 @@ class ProxyHandler {
   }
 }
 
-export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup };
+export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup, inheritance };
 "
 `;
 
@@ -21355,6 +21358,7 @@ import URLSearchParamsCollection from "./URLSearchParamsCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "URLSearchParamsCollection";
 
 const interfaceName = "URLSearchParamsCollection2";
 
@@ -21669,7 +21673,7 @@ class ProxyHandler {
   }
 }
 
-export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup };
+export default { _internalSetup, convert, create, new: createNew, createImpl, install, is, isImpl, setup, inheritance };
 "
 `;
 
