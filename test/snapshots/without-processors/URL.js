@@ -1,21 +1,20 @@
-"use strict";
-
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
+import Impl from "../implementations/URL.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
 
 const interfaceName = "URL";
 
-exports.is = value => {
-  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl.implementation;
+const is = value => {
+  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl;
 };
-exports.isImpl = value => {
-  return utils.isObject(value) && value instanceof Impl.implementation;
+const isImpl = value => {
+  return utils.isObject(value) && value instanceof Impl;
 };
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
-  if (exports.is(value)) {
+const convert = (globalObject, value, { context = "The provided value" } = {}) => {
+  if (is(value)) {
     return utils.implForWrapper(value);
   }
   throw new globalObject.TypeError(`${context} is not of type 'URL'.`);
@@ -34,24 +33,24 @@ function makeWrapper(globalObject, newTarget) {
   return Object.create(proto);
 }
 
-exports.create = (globalObject, constructorArgs, privateData) => {
+const create = (globalObject, constructorArgs, privateData) => {
   const wrapper = makeWrapper(globalObject);
-  return exports.setup(wrapper, globalObject, constructorArgs, privateData);
+  return setup(wrapper, globalObject, constructorArgs, privateData);
 };
 
-exports.createImpl = (globalObject, constructorArgs, privateData) => {
-  const wrapper = exports.create(globalObject, constructorArgs, privateData);
+const createImpl = (globalObject, constructorArgs, privateData) => {
+  const wrapper = create(globalObject, constructorArgs, privateData);
   return utils.implForWrapper(wrapper);
 };
 
-exports._internalSetup = (wrapper, globalObject) => {};
+const _internalSetup = (wrapper, globalObject) => {};
 
-exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
+const setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
   privateData.wrapper = wrapper;
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: new Impl.implementation(globalObject, constructorArgs, privateData),
+    value: new Impl(globalObject, constructorArgs, privateData),
     configurable: true
   });
 
@@ -62,12 +61,12 @@ exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) 
   return wrapper;
 };
 
-exports.new = (globalObject, newTarget) => {
+const createNew = (globalObject, newTarget) => {
   const wrapper = makeWrapper(globalObject, newTarget);
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: Object.create(Impl.implementation.prototype),
+    value: Object.create(Impl.prototype),
     configurable: true
   });
 
@@ -80,7 +79,7 @@ exports.new = (globalObject, newTarget) => {
 
 const exposed = new Set(["Window", "Worker"]);
 
-exports.install = (globalObject, globalNames) => {
+const install = (globalObject, globalNames) => {
   if (!globalNames.some(globalName => exposed.has(globalName))) {
     return;
   }
@@ -112,12 +111,12 @@ exports.install = (globalObject, globalNames) => {
         }
         args.push(curArg);
       }
-      return exports.setup(Object.create(new.target.prototype), globalObject, args);
+      return setup(Object.create(new.target.prototype), globalObject, args);
     }
 
     toJSON() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'toJSON' called on an object that is not a valid instance of URL.");
       }
 
@@ -127,7 +126,7 @@ exports.install = (globalObject, globalNames) => {
     get href() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get href' called on an object that is not a valid instance of URL.");
       }
 
@@ -137,7 +136,7 @@ exports.install = (globalObject, globalNames) => {
     set href(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set href' called on an object that is not a valid instance of URL.");
       }
 
@@ -151,7 +150,7 @@ exports.install = (globalObject, globalNames) => {
 
     toString() {
       const esValue = this;
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'toString' called on an object that is not a valid instance of URL.");
       }
 
@@ -161,7 +160,7 @@ exports.install = (globalObject, globalNames) => {
     get origin() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get origin' called on an object that is not a valid instance of URL.");
       }
 
@@ -171,7 +170,7 @@ exports.install = (globalObject, globalNames) => {
     get protocol() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get protocol' called on an object that is not a valid instance of URL.");
       }
 
@@ -181,7 +180,7 @@ exports.install = (globalObject, globalNames) => {
     set protocol(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set protocol' called on an object that is not a valid instance of URL.");
       }
 
@@ -196,7 +195,7 @@ exports.install = (globalObject, globalNames) => {
     get username() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get username' called on an object that is not a valid instance of URL.");
       }
 
@@ -206,7 +205,7 @@ exports.install = (globalObject, globalNames) => {
     set username(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set username' called on an object that is not a valid instance of URL.");
       }
 
@@ -221,7 +220,7 @@ exports.install = (globalObject, globalNames) => {
     get password() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get password' called on an object that is not a valid instance of URL.");
       }
 
@@ -231,7 +230,7 @@ exports.install = (globalObject, globalNames) => {
     set password(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set password' called on an object that is not a valid instance of URL.");
       }
 
@@ -246,7 +245,7 @@ exports.install = (globalObject, globalNames) => {
     get host() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get host' called on an object that is not a valid instance of URL.");
       }
 
@@ -256,7 +255,7 @@ exports.install = (globalObject, globalNames) => {
     set host(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set host' called on an object that is not a valid instance of URL.");
       }
 
@@ -271,7 +270,7 @@ exports.install = (globalObject, globalNames) => {
     get hostname() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get hostname' called on an object that is not a valid instance of URL.");
       }
 
@@ -281,7 +280,7 @@ exports.install = (globalObject, globalNames) => {
     set hostname(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set hostname' called on an object that is not a valid instance of URL.");
       }
 
@@ -296,7 +295,7 @@ exports.install = (globalObject, globalNames) => {
     get port() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get port' called on an object that is not a valid instance of URL.");
       }
 
@@ -306,7 +305,7 @@ exports.install = (globalObject, globalNames) => {
     set port(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set port' called on an object that is not a valid instance of URL.");
       }
 
@@ -321,7 +320,7 @@ exports.install = (globalObject, globalNames) => {
     get pathname() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get pathname' called on an object that is not a valid instance of URL.");
       }
 
@@ -331,7 +330,7 @@ exports.install = (globalObject, globalNames) => {
     set pathname(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set pathname' called on an object that is not a valid instance of URL.");
       }
 
@@ -346,7 +345,7 @@ exports.install = (globalObject, globalNames) => {
     get search() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get search' called on an object that is not a valid instance of URL.");
       }
 
@@ -356,7 +355,7 @@ exports.install = (globalObject, globalNames) => {
     set search(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set search' called on an object that is not a valid instance of URL.");
       }
 
@@ -371,7 +370,7 @@ exports.install = (globalObject, globalNames) => {
     get searchParams() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get searchParams' called on an object that is not a valid instance of URL.");
       }
 
@@ -383,7 +382,7 @@ exports.install = (globalObject, globalNames) => {
     get hash() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get hash' called on an object that is not a valid instance of URL.");
       }
 
@@ -393,7 +392,7 @@ exports.install = (globalObject, globalNames) => {
     set hash(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set hash' called on an object that is not a valid instance of URL.");
       }
 
@@ -439,4 +438,14 @@ exports.install = (globalObject, globalNames) => {
   }
 };
 
-const Impl = require("../implementations/URL.js");
+export default {
+  _internalSetup,
+  convert,
+  create,
+  new: createNew,
+  createImpl,
+  install,
+  is,
+  isImpl,
+  setup
+};

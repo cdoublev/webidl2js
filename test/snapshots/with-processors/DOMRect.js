@@ -1,22 +1,22 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
+import Impl from "../implementations/DOMRect.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import Dictionary from "./Dictionary.js";
 
-const Dictionary = require("./Dictionary.js");
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
 
 const interfaceName = "DOMRect";
 
-exports.is = value => {
-  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl.implementation;
+const is = value => {
+  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl;
 };
-exports.isImpl = value => {
-  return utils.isObject(value) && value instanceof Impl.implementation;
+const isImpl = value => {
+  return utils.isObject(value) && value instanceof Impl;
 };
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
-  if (exports.is(value)) {
+const convert = (globalObject, value, { context = "The provided value" } = {}) => {
+  if (is(value)) {
     return utils.implForWrapper(value);
   }
   throw new globalObject.TypeError(`${context} is not of type 'DOMRect'.`);
@@ -35,24 +35,24 @@ function makeWrapper(globalObject, newTarget) {
   return Object.create(proto);
 }
 
-exports.create = (globalObject, constructorArgs, privateData) => {
+const create = (globalObject, constructorArgs, privateData) => {
   const wrapper = makeWrapper(globalObject);
-  return exports.setup(wrapper, globalObject, constructorArgs, privateData);
+  return setup(wrapper, globalObject, constructorArgs, privateData);
 };
 
-exports.createImpl = (globalObject, constructorArgs, privateData) => {
-  const wrapper = exports.create(globalObject, constructorArgs, privateData);
+const createImpl = (globalObject, constructorArgs, privateData) => {
+  const wrapper = create(globalObject, constructorArgs, privateData);
   return utils.implForWrapper(wrapper);
 };
 
-exports._internalSetup = (wrapper, globalObject) => {};
+const _internalSetup = (wrapper, globalObject) => {};
 
-exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
+const setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
   privateData.wrapper = wrapper;
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: new Impl.implementation(globalObject, constructorArgs, privateData),
+    value: new Impl(globalObject, constructorArgs, privateData),
     configurable: true
   });
 
@@ -63,12 +63,12 @@ exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) 
   return wrapper;
 };
 
-exports.new = (globalObject, newTarget) => {
+const createNew = (globalObject, newTarget) => {
   const wrapper = makeWrapper(globalObject, newTarget);
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: Object.create(Impl.implementation.prototype),
+    value: Object.create(Impl.prototype),
     configurable: true
   });
 
@@ -81,7 +81,7 @@ exports.new = (globalObject, newTarget) => {
 
 const exposed = new Set(["Window", "Worker"]);
 
-exports.install = (globalObject, globalNames) => {
+const install = (globalObject, globalNames) => {
   if (!globalNames.some(globalName => exposed.has(globalName))) {
     return;
   }
@@ -138,13 +138,13 @@ exports.install = (globalObject, globalNames) => {
         }
         args.push(curArg);
       }
-      return exports.setup(Object.create(new.target.prototype), globalObject, args);
+      return setup(Object.create(new.target.prototype), globalObject, args);
     }
 
     get x() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get x' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -154,7 +154,7 @@ exports.install = (globalObject, globalNames) => {
     set x(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set x' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -169,7 +169,7 @@ exports.install = (globalObject, globalNames) => {
     get y() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get y' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -179,7 +179,7 @@ exports.install = (globalObject, globalNames) => {
     set y(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set y' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -194,7 +194,7 @@ exports.install = (globalObject, globalNames) => {
     get width() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get width' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -204,7 +204,7 @@ exports.install = (globalObject, globalNames) => {
     set width(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set width' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -219,7 +219,7 @@ exports.install = (globalObject, globalNames) => {
     get height() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'get height' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -229,7 +229,7 @@ exports.install = (globalObject, globalNames) => {
     set height(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError("'set height' called on an object that is not a valid instance of DOMRect.");
       }
 
@@ -250,7 +250,7 @@ exports.install = (globalObject, globalNames) => {
         });
         args.push(curArg);
       }
-      return utils.tryWrapperForImpl(Impl.implementation.fromRect(globalObject, ...args));
+      return utils.tryWrapperForImpl(Impl.fromRect(globalObject, ...args));
     }
   }
   Object.defineProperties(DOMRect.prototype, {
@@ -278,4 +278,14 @@ exports.install = (globalObject, globalNames) => {
   }
 };
 
-const Impl = require("../implementations/DOMRect.js");
+export default {
+  _internalSetup,
+  convert,
+  create,
+  new: createNew,
+  createImpl,
+  install,
+  is,
+  isImpl,
+  setup
+};

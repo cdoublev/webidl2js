@@ -1,12 +1,10 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import URL from "./URL.js";
+import URLSearchParams from "./URLSearchParams.js";
 
-const URL = require("./URL.js");
-const URLSearchParams = require("./URLSearchParams.js");
-
-exports._convertInherit = (globalObject, obj, ret, { context = "The provided value" } = {}) => {
+export const _convertInherit = (globalObject, obj, ret, { context = "The provided value" } = {}) => {
   {
     const key = "boolWithDefault";
     let value = obj === undefined || obj === null ? undefined : obj[key];
@@ -71,12 +69,14 @@ exports._convertInherit = (globalObject, obj, ret, { context = "The provided val
   }
 };
 
-exports.convert = (globalObject, obj, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, obj, { context = "The provided value" } = {}) => {
   if (obj !== undefined && typeof obj !== "object" && typeof obj !== "function") {
     throw new globalObject.TypeError(`${context} is not an object.`);
   }
 
   const ret = Object.create(null);
-  exports._convertInherit(globalObject, obj, ret, { context });
+  _convertInherit(globalObject, obj, ret, { context });
   return ret;
 };
+
+export default { _convertInherit, convert };

@@ -1,6 +1,4 @@
-"use strict";
-
-const enumerationValues = new Set([
+export const enumerationValues = new Set([
   "",
   "audio",
   "document",
@@ -18,12 +16,13 @@ const enumerationValues = new Set([
   "worker",
   "xslt"
 ]);
-exports.enumerationValues = enumerationValues;
 
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, value, { context = "The provided value" } = {}) => {
   const string = `${value}`;
   if (!enumerationValues.has(string)) {
     throw new globalObject.TypeError(`${context} '${string}' is not a valid enumeration value for RequestDestination`);
   }
   return string;
 };
+
+export default { convert, enumerationValues };

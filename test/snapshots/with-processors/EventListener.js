@@ -1,9 +1,7 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
-
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, value, { context = "The provided value" } = {}) => {
   if (!utils.isObject(value)) {
     throw new globalObject.TypeError(`${context} is not an object.`);
   }
@@ -32,4 +30,6 @@ exports.convert = (globalObject, value, { context = "The provided value" } = {})
   return callTheUserObjectsOperation;
 };
 
-exports.install = (globalObject, globalNames) => {};
+export const install = (globalObject, globalNames) => {};
+
+export default { convert, install };

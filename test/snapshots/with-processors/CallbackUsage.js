@@ -1,14 +1,12 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import Function from "./Function.js";
+import URLCallback from "./URLCallback.js";
+import URLHandlerNonNull from "./URLHandlerNonNull.js";
+import VoidFunction from "./VoidFunction.js";
 
-const Function = require("./Function.js");
-const URLCallback = require("./URLCallback.js");
-const URLHandlerNonNull = require("./URLHandlerNonNull.js");
-const VoidFunction = require("./VoidFunction.js");
-
-exports._convertInherit = (globalObject, obj, ret, { context = "The provided value" } = {}) => {
+export const _convertInherit = (globalObject, obj, ret, { context = "The provided value" } = {}) => {
   {
     const key = "function";
     let value = obj === undefined || obj === null ? undefined : obj[key];
@@ -65,12 +63,14 @@ exports._convertInherit = (globalObject, obj, ret, { context = "The provided val
   }
 };
 
-exports.convert = (globalObject, obj, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, obj, { context = "The provided value" } = {}) => {
   if (obj !== undefined && typeof obj !== "object" && typeof obj !== "function") {
     throw new globalObject.TypeError(`${context} is not an object.`);
   }
 
   const ret = Object.create(null);
-  exports._convertInherit(globalObject, obj, ret, { context });
+  _convertInherit(globalObject, obj, ret, { context });
   return ret;
 };
+
+export default { _convertInherit, convert };

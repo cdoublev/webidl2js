@@ -1,9 +1,7 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
-
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, value, { context = "The provided value" } = {}) => {
   if (typeof value !== "function") {
     throw new globalObject.TypeError(context + " is not a function");
   }
@@ -24,3 +22,5 @@ exports.convert = (globalObject, value, { context = "The provided value" } = {})
 
   return invokeTheCallbackFunction;
 };
+
+export default { convert };

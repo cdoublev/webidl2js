@@ -1,19 +1,19 @@
-"use strict";
 
-const { describe, test, before, snapshot } = require("node:test");
-const assert = require("node:assert/strict");
-const fs = require("fs");
-const path = require("path");
+import { describe, test, before, snapshot } from "node:test";
+import assert from "node:assert/strict";
+import fs from "fs";
+import path from "path";
+import Transformer from "../lib/transformer.js";
+import * as reflector from "./reflector.js";
 
 snapshot.setDefaultSnapshotSerializers([value => value]);
-const Transformer = require("..");
-const reflector = require("./reflector");
 
-const rootDir = path.resolve(__dirname, "..");
-const casesDir = path.resolve(__dirname, "cases");
-const implsDir = path.resolve(__dirname, "implementations");
-const outputDir = path.resolve(__dirname, "output");
-const snapshotsDir = path.resolve(__dirname, "snapshots");
+const dir = import.meta.dirname
+const rootDir = path.resolve(dir, "..");
+const casesDir = path.resolve(dir, "cases");
+const implsDir = path.resolve(dir, "implementations");
+const outputDir = path.resolve(dir, "output");
+const snapshotsDir = path.resolve(dir, "snapshots");
 
 const idlFiles = fs.readdirSync(casesDir);
 

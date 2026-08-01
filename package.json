@@ -3,6 +3,7 @@
   "version": "20.1.0",
   "description": "Auto-generates class structures for WebIDL specifications",
   "main": "lib/transformer.js",
+  "type": "module",
   "files": [
     "lib/"
   ],

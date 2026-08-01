@@ -1,6 +1,5 @@
-"use strict";
 
-module.exports.boolean = {
+export const boolean = {
   get(implObj, attrName) {
     return `return ${implObj}.hasAttributeNS(null, "${attrName}");`;
   },
@@ -15,7 +14,7 @@ module.exports.boolean = {
   }
 };
 
-module.exports.DOMString = {
+export const DOMString = {
   get(implObj, attrName) {
     return `
       const value = ${implObj}.getAttributeNS(null, "${attrName}");
@@ -27,7 +26,7 @@ module.exports.DOMString = {
   }
 };
 
-module.exports.USVString = {
+export const USVString = {
   get(implObj, attrName) {
     return `
       const value = ${implObj}.getAttributeNS(null, "${attrName}");
@@ -39,7 +38,7 @@ module.exports.USVString = {
   }
 };
 
-module.exports.long = {
+export const long = {
   get(implObj, attrName) {
     return `
       const value = parseInt(${implObj}.getAttributeNS(null, "${attrName}"));
@@ -51,7 +50,7 @@ module.exports.long = {
   }
 };
 
-module.exports["unsigned long"] = {
+const unsignedLong = {
   get(implObj, attrName) {
     return `
       const value = parseInt(${implObj}.getAttributeNS(null, "${attrName}"));
@@ -62,3 +61,4 @@ module.exports["unsigned long"] = {
     return `${implObj}.setAttributeNS(null, "${attrName}", String(V > 2147483647 ? 0 : V));`;
   }
 };
+export { unsignedLong as "unsigned long" };

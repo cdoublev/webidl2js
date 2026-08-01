@@ -1,21 +1,20 @@
-"use strict";
-
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
+import Impl from "../implementations/Unscopable.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
 
 const interfaceName = "Unscopable";
 
-exports.is = value => {
-  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl.implementation;
+const is = value => {
+  return utils.isObject(value) && Object.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl;
 };
-exports.isImpl = value => {
-  return utils.isObject(value) && value instanceof Impl.implementation;
+const isImpl = value => {
+  return utils.isObject(value) && value instanceof Impl;
 };
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
-  if (exports.is(value)) {
+const convert = (globalObject, value, { context = "The provided value" } = {}) => {
+  if (is(value)) {
     return utils.implForWrapper(value);
   }
   throw new globalObject.TypeError(`${context} is not of type 'Unscopable'.`);
@@ -34,24 +33,24 @@ function makeWrapper(globalObject, newTarget) {
   return Object.create(proto);
 }
 
-exports.create = (globalObject, constructorArgs, privateData) => {
+const create = (globalObject, constructorArgs, privateData) => {
   const wrapper = makeWrapper(globalObject);
-  return exports.setup(wrapper, globalObject, constructorArgs, privateData);
+  return setup(wrapper, globalObject, constructorArgs, privateData);
 };
 
-exports.createImpl = (globalObject, constructorArgs, privateData) => {
-  const wrapper = exports.create(globalObject, constructorArgs, privateData);
+const createImpl = (globalObject, constructorArgs, privateData) => {
+  const wrapper = create(globalObject, constructorArgs, privateData);
   return utils.implForWrapper(wrapper);
 };
 
-exports._internalSetup = (wrapper, globalObject) => {};
+const _internalSetup = (wrapper, globalObject) => {};
 
-exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
+const setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
   privateData.wrapper = wrapper;
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: new Impl.implementation(globalObject, constructorArgs, privateData),
+    value: new Impl(globalObject, constructorArgs, privateData),
     configurable: true
   });
 
@@ -62,12 +61,12 @@ exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) 
   return wrapper;
 };
 
-exports.new = (globalObject, newTarget) => {
+const createNew = (globalObject, newTarget) => {
   const wrapper = makeWrapper(globalObject, newTarget);
 
-  exports._internalSetup(wrapper, globalObject);
+  _internalSetup(wrapper, globalObject);
   Object.defineProperty(wrapper, implSymbol, {
-    value: Object.create(Impl.implementation.prototype),
+    value: Object.create(Impl.prototype),
     configurable: true
   });
 
@@ -80,7 +79,7 @@ exports.new = (globalObject, newTarget) => {
 
 const exposed = new Set(["Window"]);
 
-exports.install = (globalObject, globalNames) => {
+const install = (globalObject, globalNames) => {
   if (!globalNames.some(globalName => exposed.has(globalName))) {
     return;
   }
@@ -94,7 +93,7 @@ exports.install = (globalObject, globalNames) => {
     get unscopableTest() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError(
           "'get unscopableTest' called on an object that is not a valid instance of Unscopable."
         );
@@ -106,7 +105,7 @@ exports.install = (globalObject, globalNames) => {
     set unscopableTest(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError(
           "'set unscopableTest' called on an object that is not a valid instance of Unscopable."
         );
@@ -123,7 +122,7 @@ exports.install = (globalObject, globalNames) => {
     get unscopableMixin() {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError(
           "'get unscopableMixin' called on an object that is not a valid instance of Unscopable."
         );
@@ -135,7 +134,7 @@ exports.install = (globalObject, globalNames) => {
     set unscopableMixin(V) {
       const esValue = this !== null && this !== undefined ? this : globalObject;
 
-      if (!exports.is(esValue)) {
+      if (!is(esValue)) {
         throw new globalObject.TypeError(
           "'set unscopableMixin' called on an object that is not a valid instance of Unscopable."
         );
@@ -167,4 +166,14 @@ exports.install = (globalObject, globalNames) => {
   });
 };
 
-const Impl = require("../implementations/Unscopable.js");
+export default {
+  _internalSetup,
+  convert,
+  create,
+  new: createNew,
+  createImpl,
+  install,
+  is,
+  isImpl,
+  setup
+};

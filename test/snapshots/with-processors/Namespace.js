@@ -1,14 +1,13 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
+import Impl from "../implementations/Namespace.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
-
-const CEReactions = require("../CEReactions.js");
+import CEReactions from "../CEReactions.js";
 
 const namespaceName = "Namespace";
 const exposed = new Set(["Window", "Worker"]);
 
-exports.install = (globalObject, globalNames) => {
+export const install = (globalObject, globalNames) => {
   if (!globalNames.some(globalName => exposed.has(globalName))) {
     return;
   }
@@ -33,7 +32,7 @@ exports.install = (globalObject, globalNames) => {
       }
       CEReactions.preSteps(globalObject);
       try {
-        return Impl.implementation.configure(...args);
+        return Impl.configure(...args);
       } finally {
         CEReactions.postSteps(globalObject);
       }
@@ -67,17 +66,17 @@ exports.install = (globalObject, globalNames) => {
           }
         }
       }
-      return Impl.implementation.overloaded(...args);
+      return Impl.overloaded(...args);
     },
     createStatic() {
-      return utils.tryWrapperForImpl(Impl.implementation.createStatic(globalObject));
+      return utils.tryWrapperForImpl(Impl.createStatic(globalObject));
     },
     get version() {
-      return Impl.implementation["version"];
+      return Impl["version"];
     },
     get staticObject() {
       return utils.getSameObject(namespaceObject, "staticObject", () => {
-        return utils.tryWrapperForImpl(Impl.implementation["staticObject"]);
+        return utils.tryWrapperForImpl(Impl["staticObject"]);
       });
     }
   });
@@ -94,4 +93,4 @@ exports.install = (globalObject, globalNames) => {
   });
 };
 
-const Impl = require("../implementations/Namespace.js");
+export default { install };

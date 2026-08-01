@@ -1,9 +1,7 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
-
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
+export const convert = (globalObject, value, { context = "The provided value" } = {}) => {
   function invokeTheCallbackFunction(url) {
     const thisArg = utils.tryWrapperForImpl(this);
     let callResult;
@@ -34,3 +32,5 @@ exports.convert = (globalObject, value, { context = "The provided value" } = {})
 
   return invokeTheCallbackFunction;
 };
+
+export default { convert };
