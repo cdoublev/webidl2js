@@ -11,7 +11,7 @@
   "files": [
     "lib/"
   ],
-  "type": "commonjs",
+  "type": "module",
   "main": "lib/transformer.js",
   "scripts": {
     "check": "npm run lint && npm run fmt:check",

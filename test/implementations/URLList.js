@@ -1,8 +1,11 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class URLListImpl {
+export default class URLListImpl {
+  static init(impl) {
+    impl.wrapperSeenDuringInit = utils.wrapperForImpl(impl);
+  }
+
   constructor(globalObject, constructorArgs, { values = [] }) {
     this._values = values;
   }
@@ -18,8 +21,4 @@ exports.implementation = class URLListImpl {
   item(index) {
     return this._values[index];
   }
-};
-
-exports.init = (impl) => {
-  impl.wrapperSeenDuringInit = utils.wrapperForImpl(impl);
 };

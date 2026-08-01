@@ -1,3 +1,2 @@
-"use strict";
 
-exports.implementation = class BrandCheckParentImpl {};
+export default class BrandCheckParentImpl {};

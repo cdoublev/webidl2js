@@ -15,7 +15,7 @@ interface SomeInterface {
 combined with the JavaScript implementation class file
 
 ```js
-exports.implementation = class SomeInterfaceImpl {
+export default class SomeInterfaceImpl {
   add(x, y) {
     return x + y;
   }
@@ -25,10 +25,10 @@ exports.implementation = class SomeInterfaceImpl {
 will generate a JavaScript wrapper class file roughly like this:
 
 ```js
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const Impl = require("./SomeInterface-impl.js").implementation;
+import Impl from "./SomeInterface-impl.js";
 
 class SomeInterface {
   constructor() {
@@ -36,7 +36,7 @@ class SomeInterface {
   }
 
   add(x, y) {
-    const impl = utils.implForWrapperWithInterface(this, $interfaceDescriptor);
+    const impl = utils.implForWrapperWithInterface(this, interfaceDescriptor);
     if (impl === null) {
       throw new TypeError("Illegal invocation");
     }
@@ -65,18 +65,20 @@ Object.defineProperties(SomeInterface.prototype, {
   [Symbol.toStringTag]: { value: "SomeInterface", configurable: true },
 });
 
-exports.create = (globalObject, constructorArgs = [], privateData = {}) => {
+const create = (globalObject, constructorArgs = [], privateData = {}) => {
   const ctor = globalObject[utils.ctorRegistrySymbol].SomeInterface;
   const obj = Object.create(ctor.prototype);
   const impl = new Impl(constructorArgs, privateData);
-  utils.registerWrapper(obj, impl, $interfaceDescriptor);
+  utils.registerWrapper(obj, impl, interfaceDescriptor);
   impl[utils.wrapperSymbol] = obj;
   return obj;
 };
 
-const $interfaceDescriptor = utils.createInterfaceDescriptor();
+const interfaceDescriptor = utils.createInterfaceDescriptor();
 
-exports.is = (obj) => utils.implForWrapperWithInterface(obj, $interfaceDescriptor) !== null;
+const is = (obj) => utils.implForWrapperWithInterface(obj, interfaceDescriptor) !== null;
+
+export { create, is }
 ```
 
 The above is a simplification of the actual generated code, but should give you some idea of what's going on. We bring your attention to a few points:
@@ -98,8 +100,7 @@ For more examples, you can check out the `test/` directory (with the generated o
 A typical Node.js script that compiles IDL using webidl2js looks like the following:
 
 ```js
-"use strict";
-const WebIDL2JS = require("webidl2js");
+import WebIDL2JS from "webidl2js";
 
 const transformer = new WebIDL2JS({ implSuffix: "-impl" });
 
@@ -151,13 +152,12 @@ The following variables are available in the scope of the replacement code:
 An example of code that uses these hooks is as follows:
 
 ```js
-"use strict";
-const WebIDL2JS = require("webidl2js");
+import WebIDL2JS from "webidl2js";
 
 const transformer = new WebIDL2JS({
   implSuffix: "-impl",
   processCEReactions(code) {
-    // Add `require("../ce-reactions")` to generated file.
+    // Add `import "../ce-reactions.js"` to generated file.
     const ceReactions = this.addImport("../ce-reactions");
 
     return `
@@ -170,7 +170,7 @@ const transformer = new WebIDL2JS({
     `;
   },
   processHTMLConstructor(/* code */) {
-    // Add `require("../HTMLConstructor").HTMLConstructor` to generated file.
+    // Add `import HTMLConstructor from "../HTMLConstructor.js")` to generated file.
     const htmlConstructor = this.addImport("../HTMLConstructor", "HTMLConstructor");
 
     return `
@@ -383,9 +383,9 @@ When using the generated `new()` export, the caller is responsible for initializ
 Use the symbol factories from the generated `utils.js` to implement the attribute's set and delete algorithms:
 
 ```js
-const utils = require("./utils.js");
+import * as utils from "./utils.js";
 
-exports.implementation = class BuildingImpl {
+export default class BuildingImpl {
   constructor() {
     this.employees = [];
   }

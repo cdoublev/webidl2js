@@ -1,5 +1,4 @@
-"use strict";
 
-const { implementation: CircularParentImpl } = require("./CircularParent.js");
+import CircularParentImpl from "./CircularParent.js";
 
-exports.implementation = class CircularChildImpl extends CircularParentImpl {};
+export default class CircularChildImpl extends CircularParentImpl {};

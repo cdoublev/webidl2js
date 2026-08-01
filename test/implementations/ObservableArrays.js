@@ -1,8 +1,7 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class ObservableArraysImpl {
+export default class ObservableArraysImpl {
   constructor() {
     this.names = [];
     this.readonlyNames = [];

@@ -1,8 +1,7 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class NamedPropertiesImpl {
+export default class NamedPropertiesImpl {
   constructor() {
     this.entries = new Map();
     this.supportsCalls = [];

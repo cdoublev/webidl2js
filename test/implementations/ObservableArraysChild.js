@@ -1,5 +1,4 @@
-"use strict";
 
-const Parent = require("./ObservableArrays.js");
+import Parent from "./ObservableArrays.js";
 
-exports.implementation = class ObservableArraysChildImpl extends Parent.implementation {};
+export default class ObservableArraysChildImpl extends Parent {};

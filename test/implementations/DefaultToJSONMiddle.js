@@ -1,3 +1,4 @@
-"use strict";
 
-exports.implementation = class extends require("./DefaultToJSON.js").implementation {};
+import { default as DefaultToJSON } from "./DefaultToJSON.js";
+
+export default class extends DefaultToJSON {};

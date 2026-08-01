@@ -1,8 +1,7 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class BrandCheckIterableImpl {
+export default class BrandCheckIterableImpl {
   constructor(globalObject, args, { values }) {
     this.values = values;
     this.positions = new WeakMap();

@@ -1,6 +1,5 @@
-"use strict";
 
-exports.implementation = class HTMLCollectionImpl {
+export default class HTMLCollectionImpl {
   constructor(globalObject, constructorArgs, { indexed = [], named = {} }) {
     this._indexed = indexed;
     this._named = named;

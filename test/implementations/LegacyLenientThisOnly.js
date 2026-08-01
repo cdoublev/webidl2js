@@ -1,5 +1,4 @@
-"use strict";
 
-exports.implementation = class LegacyLenientThisOnlyImpl {
+export default class LegacyLenientThisOnlyImpl {
   value = "initial";
 };

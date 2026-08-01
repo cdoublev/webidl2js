@@ -1,8 +1,7 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class LegacyOverrideBuiltinsImpl {
+export default class LegacyOverrideBuiltinsImpl {
   constructor(globalObject, constructorArgs, { entries = {} }) {
     this._entries = entries;
   }

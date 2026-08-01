@@ -1,6 +1,5 @@
-"use strict";
 
-exports.implementation = class BrandCheckGrandchildImpl {
+export default class BrandCheckGrandchildImpl {
   constructor() {
     this.value = "grandchild";
   }

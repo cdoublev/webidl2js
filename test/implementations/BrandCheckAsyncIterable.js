@@ -1,3 +1,2 @@
-"use strict";
 
-exports.implementation = require("./BrandCheckIterable.js").implementation;
+export { default } from "./BrandCheckIterable.js"

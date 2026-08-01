@@ -1,42 +1,42 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
+import Impl from "../implementations/URLSearchParams.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
+import Function from "./Function.js";
 
-const Function = require("./Function.js");
 const newObjectInRealm = utils.newObjectInRealm;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
 
 const interfaceName = "URLSearchParams";
 
 const $interfaceDescriptor = utils.createInterfaceDescriptor();
-exports.interfaceDescriptor = $interfaceDescriptor;
+const interfaceDescriptor = $interfaceDescriptor;
 
 function $requireImpl(wrapper, globalObject, context) {
   return utils.requireImplForWrapper(
     wrapper,
-    $interfaceDescriptor,
+    interfaceDescriptor,
     globalObject,
     interfaceName,
     context,
   );
 }
 
-exports.is = (value) => {
-  return utils.implForWrapperWithInterface(value, $interfaceDescriptor) !== null;
+const is = (value) => {
+  return utils.implForWrapperWithInterface(value, interfaceDescriptor) !== null;
 };
-exports.isImpl = (value) => {
-  return utils.isObject(value) && value instanceof Impl.implementation;
+const isImpl = (value) => {
+  return utils.isObject(value) && value instanceof Impl;
 };
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
-  const impl = utils.implForWrapperWithInterface(value, $interfaceDescriptor);
+const convert = (globalObject, value, { context = "The provided value" } = {}) => {
+  const impl = utils.implForWrapperWithInterface(value, interfaceDescriptor);
   if (impl !== null) {
     return impl;
   }
   throw new globalObject.TypeError(`${context} is not of type 'URLSearchParams'.`);
 };
 
-exports.createDefaultIterator = (globalObject, target, kind) => {
+const createDefaultIterator = (globalObject, target, kind) => {
   const ctorRegistry = globalObject[ctorRegistrySymbol];
   const iteratorPrototype = ctorRegistry["URLSearchParams Iterator"];
   const iterator = Object.create(iteratorPrototype);
@@ -60,25 +60,25 @@ function makeWrapper(globalObject, newTarget) {
   return Object.create(proto);
 }
 
-exports.create = (globalObject, constructorArgs, privateData) => {
+const create = (globalObject, constructorArgs, privateData) => {
   const wrapper = makeWrapper(globalObject);
-  return exports.setup(wrapper, globalObject, constructorArgs, privateData);
+  return setup(wrapper, globalObject, constructorArgs, privateData);
 };
 
-exports.createImpl = (globalObject, constructorArgs, privateData) => {
-  const wrapper = exports.create(globalObject, constructorArgs, privateData);
+const createImpl = (globalObject, constructorArgs, privateData) => {
+  const wrapper = create(globalObject, constructorArgs, privateData);
   return utils.implForWrapper(wrapper);
 };
 
-exports._internalSetup = (wrapper, globalObject) => {};
+const _internalSetup = (wrapper, globalObject) => {};
 
-exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
+const setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) => {
   privateData.wrapper = wrapper;
 
-  exports._internalSetup(wrapper, globalObject);
-  const impl = new Impl.implementation(globalObject, constructorArgs, privateData);
+  _internalSetup(wrapper, globalObject);
+  const impl = new Impl(globalObject, constructorArgs, privateData);
 
-  utils.registerWrapper(wrapper, impl, $interfaceDescriptor);
+  utils.registerWrapper(wrapper, impl, interfaceDescriptor);
   impl[utils.wrapperSymbol] = wrapper;
   if (Impl.init) {
     Impl.init(impl);
@@ -86,13 +86,13 @@ exports.setup = (wrapper, globalObject, constructorArgs = [], privateData = {}) 
   return wrapper;
 };
 
-exports.new = (globalObject, newTarget) => {
+const createNew = (globalObject, newTarget) => {
   const wrapper = makeWrapper(globalObject, newTarget);
 
-  exports._internalSetup(wrapper, globalObject);
-  const impl = Object.create(Impl.implementation.prototype);
+  _internalSetup(wrapper, globalObject);
+  const impl = Object.create(Impl.prototype);
 
-  utils.registerWrapper(wrapper, impl, $interfaceDescriptor);
+  utils.registerWrapper(wrapper, impl, interfaceDescriptor);
   impl[utils.wrapperSymbol] = wrapper;
   if (Impl.init) {
     Impl.init(impl);
@@ -102,7 +102,7 @@ exports.new = (globalObject, newTarget) => {
 
 const exposed = new Set(["Window", "Worker"]);
 
-exports.install = (globalObject, globalNames) => {
+const install = (globalObject, globalNames) => {
   if (!globalNames.some((globalName) => exposed.has(globalName))) {
     return;
   }
@@ -193,7 +193,7 @@ exports.install = (globalObject, globalNames) => {
         }
         args.push(curArg);
       }
-      return exports.setup(Object.create(new.target.prototype), globalObject, args);
+      return setup(Object.create(new.target.prototype), globalObject, args);
     }
 
     append(name, value) {
@@ -338,17 +338,17 @@ exports.install = (globalObject, globalNames) => {
 
     keys() {
       const $impl = $requireImpl(this, globalObject, "keys");
-      return exports.createDefaultIterator(globalObject, $impl, "key");
+      return createDefaultIterator(globalObject, $impl, "key");
     }
 
     values() {
       const $impl = $requireImpl(this, globalObject, "values");
-      return exports.createDefaultIterator(globalObject, $impl, "value");
+      return createDefaultIterator(globalObject, $impl, "value");
     }
 
     entries() {
       const $impl = $requireImpl(this, globalObject, "entries");
-      return exports.createDefaultIterator(globalObject, $impl, "key+value");
+      return createDefaultIterator(globalObject, $impl, "key+value");
     }
 
     forEach(callback) {
@@ -432,4 +432,16 @@ exports.install = (globalObject, globalNames) => {
   });
 };
 
-const Impl = require("../implementations/URLSearchParams.js");
+export default {
+  _internalSetup,
+  convert,
+  create,
+  new: createNew,
+  createImpl,
+  install,
+  interfaceDescriptor,
+  is,
+  isImpl,
+  setup,
+  createDefaultIterator,
+};

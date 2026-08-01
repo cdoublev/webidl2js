@@ -1,6 +1,5 @@
-"use strict";
 
-exports.implementation = class CircularParentImpl {
+export default class CircularParentImpl {
   accept(child) {
     this.child = child;
   }

@@ -1,34 +1,34 @@
-"use strict";
 
-const { describe, test, before, beforeEach, snapshot } = require("node:test");
-const { execFileSync } = require("node:child_process");
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
-const webidl = require("webidl2");
-const idlConversions = require("webidl-conversions");
+import { describe, test, before, beforeEach, snapshot } from "node:test";
+import { execFileSync } from 'node:child_process'
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import vm from "node:vm";
+import * as webidl from "webidl2";
+import * as idlConversions from "webidl-conversions";
+import Transformer from "../lib/transformer.js";
+import * as Types from "../lib/types.js";
+import * as reflector from "./reflector.js";
 
 snapshot.setDefaultSnapshotSerializers([(value) => value]);
-const Transformer = require("..");
-const Types = require("../lib/types");
-const reflector = require("./reflector");
 
-const rootDir = path.resolve(__dirname, "..");
-const casesDir = path.resolve(__dirname, "cases");
-const implsDir = path.resolve(__dirname, "implementations");
-const outputDir = path.resolve(__dirname, "output");
-const snapshotsDir = path.resolve(__dirname, "snapshots");
+const dir = import.meta.dirname
+const rootDir = path.resolve(dir, "..");
+const casesDir = path.resolve(dir, "cases");
+const implsDir = path.resolve(dir, "implementations");
+const outputDir = path.resolve(dir, "output");
+const snapshotsDir = path.resolve(dir, "snapshots");
 
 const idlFiles = fs.readdirSync(casesDir);
 
-function createLegacyPlatformObject(name, privateData, ancestors = []) {
-  const generated = require(path.resolve(outputDir, `${name}.js`));
-  const utils = require(path.resolve(outputDir, "utils.js"));
+async function createLegacyPlatformObject(name, privateData, ancestors = []) {
+  const generated = (await import(path.resolve(outputDir, `${name}.js`))).default;
+  const utils = await import(path.resolve(outputDir, "utils.js"));
   const context = vm.createContext();
   const globalObject = vm.runInContext("globalThis", context);
   for (const interfaceName of [...ancestors, name]) {
-    require(path.resolve(outputDir, `${interfaceName}.js`)).install(globalObject, ["Window"]);
+    (await import(path.resolve(outputDir, `${interfaceName}.js`))).default.install(globalObject, ["Window"]);
   }
   const wrapper = generated.create(globalObject, [], privateData);
   return { globalObject, implementation: utils.implForWrapper(wrapper), wrapper };
@@ -202,8 +202,8 @@ describe("generation", () => {
       });
     }
 
-    test("lenient-only interfaces ignore invalid receivers before converting setter values", () => {
-      const generated = require(path.resolve(outputDir, "LegacyLenientThisOnly.js"));
+    test("lenient-only interfaces ignore invalid receivers before converting setter values", async () => {
+      const generated = (await import(path.resolve(outputDir, "LegacyLenientThisOnly.js"))).default;
       const globalObject = vm.runInNewContext("globalThis");
       generated.install(globalObject, ["Window"]);
       const wrapper = generated.create(globalObject);
@@ -227,17 +227,17 @@ describe("generation", () => {
       let globalObject, wrapper, impl, utils;
       const baseKeys = ["x", "enabled", "label", "payload", "nested", "choice", "names"];
 
-      function install() {
+      async function install() {
         const global = vm.runInNewContext("globalThis");
         for (const name of ["DefaultToJSON", "DefaultToJSONMiddle"]) {
-          require(path.join(outputDir, `${name}.js`)).install(global, ["Window"]);
+          (await import(path.join(outputDir, `${name}.js`))).default.install(global, ["Window"]);
         }
         return global;
       }
 
-      beforeEach(() => {
-        utils = require(path.join(outputDir, "utils.js"));
-        globalObject = install();
+      beforeEach(async () => {
+        utils = await import(path.join(outputDir, "utils.js"));
+        globalObject = await install();
         wrapper = new globalObject.DefaultToJSON();
         impl = utils.implForWrapper(wrapper);
       });
@@ -287,8 +287,8 @@ describe("generation", () => {
         );
       });
 
-      test("uses the invoked method's realm and preserves nested interface wrappers", () => {
-        const other = install();
+      test("uses the invoked method's realm and preserves nested interface wrappers", async () => {
+        const other = await install();
         const nested = new other.DefaultToJSONMiddle();
         impl.nested = utils.implForWrapper(nested);
         const result = other.DefaultToJSON.prototype.toJSON.call(wrapper);
@@ -345,9 +345,9 @@ describe("generation", () => {
     describe("observable arrays", () => {
       let generated, utils, globalObject, wrapper, impl;
 
-      beforeEach(() => {
-        generated = require(path.resolve(outputDir, "ObservableArrays.js"));
-        utils = require(path.resolve(outputDir, "utils.js"));
+      beforeEach(async () => {
+        generated = (await import(path.resolve(outputDir, "ObservableArrays.js"))).default;
+        utils = await import(path.resolve(outputDir, "utils.js"));
         globalObject = vm.runInNewContext("globalThis");
         generated.install(globalObject, ["Window"]);
         wrapper = new globalObject.ObservableArrays();
@@ -723,8 +723,8 @@ describe("generation", () => {
         assert.equal("0" in array, true);
       });
 
-      test("supports inherited and mixed-in attributes through every creation path", () => {
-        const child = require(path.resolve(outputDir, "ObservableArraysChild.js"));
+      test("supports inherited and mixed-in attributes through every creation path", async () => {
+        const child = (await import(path.resolve(outputDir, "ObservableArraysChild.js"))).default;
         child.install(globalObject, ["Window"]);
         for (const module of [generated, child]) {
           const createdImpl = module.new(globalObject);
@@ -843,12 +843,12 @@ describe("generation", () => {
         BrandCheckSibling.install(global, ["Window"]);
       }
 
-      beforeEach(() => {
-        BrandCheck = require(path.resolve(outputDir, "BrandCheck.js"));
-        BrandCheckParent = require(path.resolve(outputDir, "BrandCheckParent.js"));
-        BrandCheckGrandchild = require(path.resolve(outputDir, "BrandCheckGrandchild.js"));
-        BrandCheckSibling = require(path.resolve(outputDir, "BrandCheckSibling.js"));
-        utils = require(path.resolve(outputDir, "utils.js"));
+      beforeEach(async () => {
+        BrandCheck = (await import(path.resolve(outputDir, "BrandCheck.js"))).default;
+        BrandCheckParent = (await import(path.resolve(outputDir, "BrandCheckParent.js"))).default;
+        BrandCheckGrandchild = (await import(path.resolve(outputDir, "BrandCheckGrandchild.js"))).default;
+        BrandCheckSibling = (await import(path.resolve(outputDir, "BrandCheckSibling.js"))).default;
+        utils = await import(path.resolve(outputDir, "utils.js"));
         globalObject = vm.runInNewContext("globalThis");
         install(globalObject);
         wrapper = new globalObject.BrandCheck();
@@ -1003,17 +1003,15 @@ describe("generation", () => {
     for (const entry of ["CircularParent", "CircularChild"]) {
       test(`circular inheritance imports with ${entry} loaded first`, () => {
         // Each subprocess has a fresh CommonJS cache, so both dependency orders are exercised.
-        execFileSync(
-          process.execPath,
-          [
-            "-e",
-            `
-          const assert = require("node:assert/strict");
-          const vm = require("node:vm");
-          require("./${entry}.js");
-          const Parent = require("./CircularParent.js");
-          const Child = require("./CircularChild.js");
-          const utils = require("./utils.js");
+        execFileSync(process.execPath, [
+          "-e",
+          `
+          import assert from "node:assert/strict";
+          import vm from "node:vm";
+          import "./${entry}.js";
+          import Parent from "./CircularParent.js";
+          import Child from "./CircularChild.js";
+          import * as utils from "./utils.js";
           const globalObject = vm.runInNewContext("globalThis");
           Parent.install(globalObject, ["Window"]);
           Child.install(globalObject, ["Window"]);
@@ -1032,24 +1030,25 @@ describe("generation", () => {
     }
 
     describe("iterators retain implementations", () => {
-      function createIterable(name, values) {
-        const generated = require(path.resolve(outputDir, `${name}.js`));
-        const utils = require(path.resolve(outputDir, "utils.js"));
+      async function createIterable(name, values) {
+        const generated = (await import(path.resolve(outputDir, `${name}.js`))).default;
+        const utils = await import(path.resolve(outputDir, "utils.js"));
         const globalObject = vm.runInNewContext("globalThis");
         generated.install(globalObject, ["Window"]);
         const wrapper = generated.create(globalObject, [], { values });
         return { globalObject, wrapper, impl: utils.implForWrapper(wrapper), utils };
       }
 
-      test("pair iterators and forEach() expose wrappers and observe mutations", () => {
-        const BrandCheck = require(path.resolve(outputDir, "BrandCheck.js"));
+      test("pair iterators and forEach() expose wrappers and observe mutations", async () => {
+        const BrandCheck = (await import(path.resolve(outputDir, "BrandCheck.js"))).default;
         const globalObject = vm.runInNewContext("globalThis");
-        require(path.resolve(outputDir, "BrandCheckParent.js")).install(globalObject, ["Window"]);
+        const BrandCheckParent = (await import(path.resolve(outputDir, "BrandCheckParent.js"))).default;
+        BrandCheckParent.install(globalObject, ["Window"]);
         BrandCheck.install(globalObject, ["Window"]);
         const value = new globalObject.BrandCheck();
-        const utils = require(path.resolve(outputDir, "utils.js"));
+        const utils = await import(path.resolve(outputDir, "utils.js"));
         const values = [["first", utils.implForWrapper(value)]];
-        const { wrapper } = createIterable("BrandCheckIterable", values);
+        const { wrapper } = await createIterable("BrandCheckIterable", values);
         const iterator = wrapper.entries();
         assert.deepEqual(iterator.next().value, ["first", value]);
         values.push(["second", utils.implForWrapper(value)]);
@@ -1076,8 +1075,8 @@ describe("generation", () => {
       });
 
       for (const name of ["BrandCheckIterable", "BrandCheckAsyncIterable"]) {
-        test(`${name} rejects invalid receivers`, () => {
-          const { globalObject, wrapper } = createIterable(name, []);
+        test(`${name} rejects invalid receivers`, async () => {
+          const { globalObject, wrapper } = await createIterable(name, []);
           const revocable = Proxy.revocable(wrapper, {});
           revocable.revoke();
           for (const receiver of [
@@ -1092,10 +1091,11 @@ describe("generation", () => {
       }
 
       test("async pair iterators convert arguments, wrap values, serialize next(), and run return steps", async () => {
-        const { wrapper, impl, utils } = createIterable("BrandCheckAsyncIterable", [["skip", {}]]);
-        const BrandCheck = require(path.resolve(outputDir, "BrandCheck.js"));
+        const { wrapper, impl, utils } = await createIterable("BrandCheckAsyncIterable", [["skip", {}]]);
+        const BrandCheck = (await import(path.resolve(outputDir, "BrandCheck.js"))).default;
         const globalObject = vm.runInNewContext("globalThis");
-        require(path.resolve(outputDir, "BrandCheckParent.js")).install(globalObject, ["Window"]);
+        const BrandCheckParent = (await import(path.resolve(outputDir, "BrandCheckParent.js"))).default;
+        BrandCheckParent.install(globalObject, ["Window"]);
         BrandCheck.install(globalObject, ["Window"]);
         const value = new globalObject.BrandCheck();
         impl.values.push(
@@ -1129,7 +1129,7 @@ describe("generation", () => {
       });
 
       test("async value iterators unwrap their stored implementation and finish at end of iteration", async () => {
-        const { wrapper, impl } = createIterable("BrandCheckAsyncValueIterable", [
+        const { wrapper, impl } = await createIterable("BrandCheckAsyncValueIterable", [
           "first",
           "second",
         ]);
@@ -1143,9 +1143,9 @@ describe("generation", () => {
     });
 
     describe("legacy platform object property access", () => {
-      test("brands the final proxy but leaves its backing target unbranded", () => {
-        const URLList = require(path.resolve(outputDir, "URLList.js"));
-        const utils = require(path.resolve(outputDir, "utils.js"));
+      test("brands the final proxy but leaves its backing target unbranded", async () => {
+        const URLList = (await import(path.resolve(outputDir, "URLList.js"))).default;
+        const utils = await import(path.resolve(outputDir, "utils.js"));
         const globalObject = vm.runInNewContext("globalThis");
         URLList.install(globalObject, ["Window"]);
         const target = Object.create(globalObject.URLList.prototype);
@@ -1162,10 +1162,10 @@ describe("generation", () => {
         assert.equal(wrapper[0], "zero");
       });
 
-      test("borrowed methods accept wrappers from another realm and reject invalid receivers", () => {
-        const first = createLegacyPlatformObject("HTMLCollection", {});
+      test("borrowed methods accept wrappers from another realm and reject invalid receivers", async () => {
+        const first = await createLegacyPlatformObject("HTMLCollection", {});
         const indexed = ["first"];
-        const second = createLegacyPlatformObject("HTMLCollection", { indexed });
+        const second = await createLegacyPlatformObject("HTMLCollection", { indexed });
         const { item } = first.globalObject.HTMLCollection.prototype;
 
         assert.equal(item.call(second.wrapper, 0), "first");
@@ -1178,8 +1178,8 @@ describe("generation", () => {
         }
       });
 
-      test("indexed properties and ordinary fallbacks", () => {
-        const { globalObject, wrapper } = createLegacyPlatformObject("URLList", {
+      test("indexed properties and ordinary fallbacks", async () => {
+        const { globalObject, wrapper } = await createLegacyPlatformObject("URLList", {
           values: ["zero"],
         });
 
@@ -1211,13 +1211,13 @@ describe("generation", () => {
         assert.equal(wrapper.missing, undefined);
       });
 
-      test("combined indexed and named properties", () => {
+      test("combined indexed and named properties", async () => {
         const named = {
           1: "named numeric property",
           item: "named prototype property",
           person: "named property",
         };
-        const { implementation, wrapper } = createLegacyPlatformObject("HTMLCollection", {
+        const { implementation, wrapper } = await createLegacyPlatformObject("HTMLCollection", {
           indexed: ["indexed property"],
           named,
         });
@@ -1241,7 +1241,7 @@ describe("generation", () => {
         assert.equal(typeof wrapper.item, "function");
 
         const ownNamed = {};
-        const { wrapper: wrapperWithOwnProperty } = createLegacyPlatformObject("HTMLCollection", {
+        const { wrapper: wrapperWithOwnProperty } = await createLegacyPlatformObject("HTMLCollection", {
           named: ownNamed,
         });
         Object.defineProperty(wrapperWithOwnProperty, "person", {
@@ -1252,8 +1252,8 @@ describe("generation", () => {
         assert.equal(wrapperWithOwnProperty.person, "own property");
       });
 
-      test("skips named lookup for ordinary prototype properties", () => {
-        const { wrapper, implementation } = createLegacyPlatformObject("HTMLCollection", {
+      test("skips named lookup for ordinary prototype properties", async () => {
+        const { wrapper, implementation } = await createLegacyPlatformObject("HTMLCollection", {
           indexed: ["first", "second"],
           named: { length: "named length", item: "named item" },
         });
@@ -1276,8 +1276,8 @@ describe("generation", () => {
           ]);
         }
 
-        test("skips named lookups for inherited members during iteration", () => {
-          const { wrapper, implementation } = createCollection({
+        test("skips named lookups for inherited members during iteration", async () => {
+          const { wrapper, implementation } = await createCollection({
             indexed: ["first", "second"],
             named: { length: "named length", item: "named item" },
           });
@@ -1291,8 +1291,8 @@ describe("generation", () => {
           assert.deepEqual(implementation.namedCalls, ["length"]);
         });
 
-        test("checks more than one ordinary ancestor", () => {
-          const { wrapper, implementation } = createLegacyPlatformObject(
+        test("checks more than one ordinary ancestor", async () => {
+          const { wrapper, implementation } = await createLegacyPlatformObject(
             "InheritedCollection",
             {
               indexed: ["first", "second"],
@@ -1304,8 +1304,8 @@ describe("generation", () => {
           assert.deepEqual(implementation.namedCalls, []);
         });
 
-        test("reflects ancestor property changes without invoking accessors early", () => {
-          const { globalObject, wrapper, implementation } = createCollection({
+        test("reflects ancestor property changes without invoking accessors early", async () => {
+          const { globalObject, wrapper, implementation } = await createCollection({
             named: { length: "named length", custom: "named custom" },
           });
           const { prototype } = globalObject.HTMLCollection;
@@ -1332,14 +1332,14 @@ describe("generation", () => {
           assert.equal(wrapper.custom, "named custom");
         });
 
-        test("falls back for changed ancestors and resumes after restoring them", () => {
-          const { globalObject, wrapper, implementation } = createCollection({
+        test("falls back for changed ancestors and resumes after restoring them", async () => {
+          const { globalObject, wrapper, implementation } = await createCollection({
             indexed: ["element"],
             named: { length: "named length" },
           });
           const childPrototype = globalObject.HTMLFormControlsCollection.prototype;
           const parentPrototype = globalObject.HTMLCollection.prototype;
-          const other = createCollection();
+          const other = await createCollection();
           Object.setPrototypeOf(childPrototype, other.globalObject.HTMLCollection.prototype);
           globalObject.HTMLCollection = new Proxy(() => {}, {
             get() {
@@ -1356,8 +1356,8 @@ describe("generation", () => {
           assert.equal(wrapper.length, "named length");
         });
 
-        test("does not probe a proxy inserted between ordinary prototypes", () => {
-          const { globalObject, wrapper, implementation } = createCollection();
+        test("does not probe a proxy inserted between ordinary prototypes", async () => {
+          const { globalObject, wrapper, implementation } = await createCollection();
           const calls = [];
           function unexpected() {
             throw new Error("unexpected ancestor trap");
@@ -1379,8 +1379,8 @@ describe("generation", () => {
           assert.deepEqual(calls, ["length"]);
         });
 
-        test("preserves supported-name lookup before observable ancestor checks", () => {
-          const { globalObject, wrapper, implementation } = createCollection({
+        test("preserves supported-name lookup before observable ancestor checks", async () => {
+          const { globalObject, wrapper, implementation } = await createCollection({
             named: { length: "named length" },
           });
           const marker = new Error("ancestor check");
@@ -1400,8 +1400,8 @@ describe("generation", () => {
           );
         });
 
-        test("does not probe a revoked ancestor proxy", () => {
-          const { globalObject, wrapper } = createCollection();
+        test("does not probe a revoked ancestor proxy", async () => {
+          const { globalObject, wrapper } = await createCollection();
           const { proxy, revoke } = Proxy.revocable(globalObject.HTMLCollection.prototype, {});
           Object.setPrototypeOf(globalObject.HTMLFormControlsCollection.prototype, proxy);
           revoke();
@@ -1410,8 +1410,8 @@ describe("generation", () => {
           assert.throws(() => wrapper.length, TypeError);
         });
 
-        test("does not trust an ancestor proxy present during installation", () => {
-          const { globalObject } = createLegacyPlatformObject("HTMLCollection", {});
+        test("does not trust an ancestor proxy present during installation", async () => {
+          const { globalObject } = await createLegacyPlatformObject("HTMLCollection", {});
           const parentPrototype = globalObject.HTMLCollection.prototype;
           function unexpected() {
             throw new Error("unexpected ancestor trap");
@@ -1422,7 +1422,7 @@ describe("generation", () => {
             getOwnPropertyDescriptor: unexpected,
             has: unexpected,
           });
-          const generated = require(path.resolve(outputDir, "HTMLFormControlsCollection.js"));
+          const generated = (await import(path.resolve(outputDir, "HTMLFormControlsCollection.js"))).default;
           generated.install(globalObject, ["Window"]);
           const wrapper = generated.create(globalObject);
           assert.equal(Object.getOwnPropertyDescriptor(wrapper, "length"), undefined);
@@ -1430,8 +1430,8 @@ describe("generation", () => {
           assert.equal(wrapper.length, 0);
         });
 
-        test("stops before an unknown proxy above a captured ancestor", () => {
-          const { globalObject, wrapper, implementation } = createCollection();
+        test("stops before an unknown proxy above a captured ancestor", async () => {
+          const { globalObject, wrapper, implementation } = await createCollection();
           const { prototype } = globalObject.HTMLCollection;
           const { proxy, revoke } = Proxy.revocable(Object.getPrototypeOf(prototype), {});
           Object.setPrototypeOf(prototype, proxy);
@@ -1443,9 +1443,9 @@ describe("generation", () => {
           assert.deepEqual(implementation.namedCalls, ["missing"]);
         });
 
-        test("does not probe caller-supplied wrapper proxies", () => {
-          const { globalObject } = createCollection();
-          const generated = require(path.resolve(outputDir, "HTMLFormControlsCollection.js"));
+        test("does not probe caller-supplied wrapper proxies", async () => {
+          const { globalObject } = await createCollection();
+          const generated = (await import(path.resolve(outputDir, "HTMLFormControlsCollection.js"))).default;
           const target = new Proxy(
             Object.create(globalObject.HTMLFormControlsCollection.prototype),
             {
@@ -1460,12 +1460,12 @@ describe("generation", () => {
         });
       });
 
-      test("reflects changes to ordinary prototype properties", () => {
-        const { globalObject, wrapper, implementation } = createLegacyPlatformObject(
+      test("reflects changes to ordinary prototype properties", async () => {
+        const { globalObject, wrapper, implementation } = await createLegacyPlatformObject(
           "HTMLCollection",
           {
-            named: { length: "named length", custom: "named custom" },
-          },
+            named: { length: "named length", custom: "named custom" }
+          }
         );
         const { prototype } = globalObject.HTMLCollection;
         delete prototype.length;
@@ -1493,10 +1493,10 @@ describe("generation", () => {
         assert.equal(wrapper.length, "named length");
       });
 
-      test("captures the installed prototype independently of the public constructor", () => {
-        const { globalObject, wrapper, implementation } = createLegacyPlatformObject(
+      test("captures the installed prototype independently of the public constructor", async () => {
+        const { globalObject, wrapper, implementation } = await createLegacyPlatformObject(
           "HTMLCollection",
-          {},
+          {}
         );
         globalObject.HTMLCollection = new Proxy(() => {}, {
           get() {
@@ -1507,8 +1507,8 @@ describe("generation", () => {
         assert.deepEqual(implementation.namedCalls, []);
       });
 
-      test("does not inspect unrecognized prototype proxies for unsupported names", () => {
-        const { globalObject, wrapper } = createLegacyPlatformObject("HTMLCollection", {});
+      test("does not inspect unrecognized prototype proxies for unsupported names", async () => {
+        const { globalObject, wrapper } = await createLegacyPlatformObject("HTMLCollection", {});
         const calls = [];
         function unexpected() {
           throw new Error("unexpected prototype trap");
@@ -1531,8 +1531,8 @@ describe("generation", () => {
         assert.deepEqual(calls, ["length"]);
       });
 
-      test("does not inspect revoked prototype proxies for unsupported names", () => {
-        const { globalObject, wrapper } = createLegacyPlatformObject("HTMLCollection", {});
+      test("does not inspect revoked prototype proxies for unsupported names", async () => {
+        const { globalObject, wrapper } = await createLegacyPlatformObject("HTMLCollection", {});
         const { proxy, revoke } = Proxy.revocable(globalObject.HTMLCollection.prototype, {});
         Object.setPrototypeOf(wrapper, proxy);
         revoke();
@@ -1540,10 +1540,10 @@ describe("generation", () => {
         assert.throws(() => wrapper.length, TypeError);
       });
 
-      test("does not traverse beyond the captured prototype", () => {
-        const { globalObject, wrapper, implementation } = createLegacyPlatformObject(
+      test("does not traverse beyond the captured prototype", async () => {
+        const { globalObject, wrapper, implementation } = await createLegacyPlatformObject(
           "HTMLCollection",
-          {},
+          {}
         );
         const { prototype } = globalObject.HTMLCollection;
         const { proxy, revoke } = Proxy.revocable(Object.getPrototypeOf(prototype), {});
@@ -1555,11 +1555,11 @@ describe("generation", () => {
         assert.equal(Object.getOwnPropertyDescriptor(wrapper, "missing"), undefined);
       });
 
-      test("preserves the supported-name lookup before observable prototype checks", () => {
-        const { globalObject, wrapper, implementation } = createLegacyPlatformObject(
+      test("preserves the supported-name lookup before observable prototype checks", async () => {
+        const { globalObject, wrapper, implementation } = await createLegacyPlatformObject(
           "HTMLCollection",
           {
-            named: { length: "named length" },
+            named: { length: "named length" }
           },
         );
         const marker = new Error("prototype check");
@@ -1578,12 +1578,12 @@ describe("generation", () => {
         );
       });
 
-      test("preserves indexed property precedence over ordinary prototype properties", () => {
-        const { globalObject, wrapper, implementation } = createLegacyPlatformObject(
+      test("preserves indexed property precedence over ordinary prototype properties", async () => {
+        const { globalObject, wrapper, implementation } = await createLegacyPlatformObject(
           "HTMLCollection",
           {
             indexed: ["indexed value"],
-            named: { 0: "named value", 1: "unsupported index" },
+            named: { 0: "named value", 1: "unsupported index" }
           },
         );
         Object.defineProperty(globalObject.HTMLCollection.prototype, "0", {
@@ -1597,9 +1597,9 @@ describe("generation", () => {
         assert.deepEqual(implementation.namedCalls, []);
       });
 
-      test("preserves caller-supplied proxy wrappers passed to setup", () => {
-        const { globalObject } = createLegacyPlatformObject("HTMLCollection", {});
-        const generated = require(path.resolve(outputDir, "HTMLCollection.js"));
+      test("preserves caller-supplied proxy wrappers passed to setup", async () => {
+        const { globalObject } = await createLegacyPlatformObject("HTMLCollection", {});
+        const generated = (await import(path.resolve(outputDir, "HTMLCollection.js"))).default;
         const target = new Proxy(Object.create(globalObject.HTMLCollection.prototype), {
           getPrototypeOf() {
             throw new Error("unexpected wrapper prototype trap");
@@ -1610,10 +1610,10 @@ describe("generation", () => {
         assert.equal(Object.getOwnPropertyDescriptor(wrapper, "length"), undefined);
       });
 
-      test("optimizes internally created wrappers with delayed implementation initialization", () => {
-        const { globalObject } = createLegacyPlatformObject("HTMLCollection", {});
-        const generated = require(path.resolve(outputDir, "HTMLCollection.js"));
-        const utils = require(path.resolve(outputDir, "utils.js"));
+      test("optimizes internally created wrappers with delayed implementation initialization", async () => {
+        const { globalObject } = await createLegacyPlatformObject("HTMLCollection", {});
+        const generated = (await import(path.resolve(outputDir, "HTMLCollection.js"))).default;
+        const utils = await import(path.resolve(outputDir, "utils.js"));
         const implementation = generated.new(globalObject);
         implementation._indexed = [];
         implementation._named = {};
@@ -1624,9 +1624,9 @@ describe("generation", () => {
         assert.deepEqual(implementation.namedCalls, []);
       });
 
-      test("optimizes public constructors and separate supported-name checks", () => {
-        const generated = require(path.resolve(outputDir, "NamedProperties.js"));
-        const utils = require(path.resolve(outputDir, "utils.js"));
+      test("optimizes public constructors and separate supported-name checks", async () => {
+        const generated = (await import(path.resolve(outputDir, "NamedProperties.js"))).default;
+        const utils = await import(path.resolve(outputDir, "utils.js"));
         const globalObject = vm.runInNewContext("globalThis");
         generated.install(globalObject, ["Window"]);
         const wrapper = new globalObject.NamedProperties();
@@ -1648,17 +1648,17 @@ describe("generation", () => {
         assert.deepEqual(implementation.namedCalls, ["length", "length"]);
       });
 
-      test("preserves lookups after changing to another realm's prototype", () => {
-        const { wrapper } = createLegacyPlatformObject("HTMLCollection", { indexed: ["element"] });
-        const { globalObject } = createLegacyPlatformObject("HTMLCollection", {});
+      test("preserves lookups after changing to another realm's prototype", async () => {
+        const { wrapper } = await createLegacyPlatformObject("HTMLCollection", { indexed: ["element"] });
+        const { globalObject } = await createLegacyPlatformObject("HTMLCollection", {});
         Object.setPrototypeOf(wrapper, globalObject.HTMLCollection.prototype);
         assert.equal(wrapper.length, 1);
         assert.equal(Object.getOwnPropertyDescriptor(wrapper, "length"), undefined);
       });
 
-      test("LegacyOverrideBuiltins named properties", () => {
+      test("LegacyOverrideBuiltins named properties", async () => {
         const entries = { inherited: "named property" };
-        const { globalObject, wrapper } = createLegacyPlatformObject("LegacyOverrideBuiltins", {
+        const { globalObject, wrapper } = await createLegacyPlatformObject("LegacyOverrideBuiltins", {
           entries,
         });
         Object.defineProperty(globalObject.LegacyOverrideBuiltins.prototype, "inherited", {
@@ -1668,10 +1668,10 @@ describe("generation", () => {
         assert.equal(wrapper.inherited, "named property");
 
         const ownEntries = {};
-        const { wrapper: wrapperWithOwnProperty } = createLegacyPlatformObject(
+        const { wrapper: wrapperWithOwnProperty } = await createLegacyPlatformObject(
           "LegacyOverrideBuiltins",
           {
-            entries: ownEntries,
+            entries: ownEntries
           },
         );
         Object.defineProperty(wrapperWithOwnProperty, "own", {

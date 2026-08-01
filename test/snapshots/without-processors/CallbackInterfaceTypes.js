@@ -1,9 +1,7 @@
-"use strict";
+import conversions from "webidl-conversions";
+import * as utils from "./utils.js";
 
-const conversions = require("webidl-conversions");
-const utils = require("./utils.js");
-
-exports.convert = (globalObject, value, { context = "The provided value" } = {}) => {
+const convert = (globalObject, value, { context = "The provided value" } = {}) => {
   if (!utils.isObject(value)) {
     throw new globalObject.TypeError(`${context} is not an object.`);
   }
@@ -42,7 +40,7 @@ exports.convert = (globalObject, value, { context = "The provided value" } = {})
 
 const exposed = new Set(["Window", "Worker"]);
 
-exports.install = (globalObject, globalNames) => {
+const install = (globalObject, globalNames) => {
   if (!globalNames.some((globalName) => exposed.has(globalName))) {
     return;
   }
@@ -60,3 +58,5 @@ exports.install = (globalObject, globalNames) => {
     value: CallbackInterfaceTypes,
   });
 };
+
+export default { convert, install };

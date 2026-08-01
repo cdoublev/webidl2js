@@ -1,8 +1,11 @@
-"use strict";
 
-const utils = require("../output/utils.js");
+import * as utils from "../output/utils.js";
 
-exports.implementation = class BrandCheckImpl {
+export default class BrandCheckImpl {
+  static init(impl) {
+    impl.wrapperSeenDuringInit = utils.wrapperForImpl(impl);
+  }
+
   constructor() {
     this.value = "initial";
   }
@@ -22,8 +25,4 @@ exports.implementation = class BrandCheckImpl {
   objectUnion(value) {
     this.lastObjectUnionValue = value;
   }
-};
-
-exports.init = (impl) => {
-  impl.wrapperSeenDuringInit = utils.wrapperForImpl(impl);
 };

@@ -1,6 +1,5 @@
-"use strict";
 
-exports.implementation = class DefaultToJSONImpl {
+export default class DefaultToJSONImpl {
   constructor() {
     this.x = 1;
     this.enabled = true;

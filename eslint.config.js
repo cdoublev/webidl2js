@@ -11,14 +11,7 @@ export default [
   {
     files: ["**/*.js"],
     languageOptions: {
-      sourceType: "commonjs",
       globals: globals.node,
-    },
-  },
-  {
-    files: ["**/*.mjs"],
-    languageOptions: {
-      globals: globals.nodeBuiltin,
     },
   },
 ];
