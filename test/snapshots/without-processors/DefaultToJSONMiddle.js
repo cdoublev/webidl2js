@@ -5,6 +5,7 @@ import Impl from "../implementations/DefaultToJSONMiddle.js";
 import DefaultToJSON from "./DefaultToJSON.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "DefaultToJSON";
 
 const interfaceName = "DefaultToJSONMiddle";
 
@@ -134,4 +135,5 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
 };

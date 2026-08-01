@@ -5,6 +5,7 @@ import Impl from "../implementations/BrandCheckSibling.js";
 import BrandCheckParent from "./BrandCheckParent.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "BrandCheckParent";
 
 const interfaceName = "BrandCheckSibling";
 
@@ -134,4 +135,5 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
 };

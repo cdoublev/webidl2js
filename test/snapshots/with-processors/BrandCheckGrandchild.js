@@ -5,6 +5,7 @@ import Impl from "../implementations/BrandCheckGrandchild.js";
 import BrandCheck from "./BrandCheck.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "BrandCheck";
 
 const interfaceName = "BrandCheckGrandchild";
 
@@ -132,4 +133,5 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
 };

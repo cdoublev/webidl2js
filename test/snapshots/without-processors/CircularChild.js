@@ -5,6 +5,7 @@ import Impl from "../implementations/CircularChild.js";
 import CircularParent from "./CircularParent.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "CircularParent";
 
 const interfaceName = "CircularChild";
 
@@ -118,4 +119,5 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
 };

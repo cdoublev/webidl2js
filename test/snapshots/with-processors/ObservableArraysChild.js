@@ -5,6 +5,7 @@ import Impl from "../implementations/ObservableArraysChild.js";
 import ObservableArrays from "./ObservableArrays.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "ObservableArrays";
 
 const interfaceName = "ObservableArraysChild";
 
@@ -122,5 +123,6 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
   _initializeObservableArrays,
 };

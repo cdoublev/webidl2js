@@ -5,6 +5,7 @@ import Impl from "../implementations/InheritedCollection.js";
 import HTMLFormControlsCollection from "./HTMLFormControlsCollection.js";
 
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "HTMLFormControlsCollection";
 
 const interfaceName = "InheritedCollection";
 
@@ -351,4 +352,5 @@ export default {
   is,
   isImpl,
   setup,
+  inheritance,
 };
