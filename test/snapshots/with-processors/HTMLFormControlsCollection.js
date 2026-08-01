@@ -6,6 +6,7 @@ import HTMLCollection from "./HTMLCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "HTMLCollection";
 
 const interfaceName = "HTMLFormControlsCollection";
 
@@ -324,5 +325,6 @@ export default {
   install,
   is,
   isImpl,
-  setup
+  setup,
+  inheritance
 };

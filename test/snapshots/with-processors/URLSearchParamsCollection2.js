@@ -7,6 +7,7 @@ import URLSearchParamsCollection from "./URLSearchParamsCollection.js";
 
 const implSymbol = utils.implSymbol;
 const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const inheritance = "URLSearchParamsCollection";
 
 const interfaceName = "URLSearchParamsCollection2";
 
@@ -330,5 +331,6 @@ export default {
   install,
   is,
   isImpl,
-  setup
+  setup,
+  inheritance
 };
